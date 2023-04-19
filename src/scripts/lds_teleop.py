@@ -3,7 +3,7 @@ import pygame as pg
 import threading
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
-from sprites import LDS, RobotModel
+from sprites import LDS, RobotModel, Text
 from settings import *
 from pygame.locals import * 
 import sys
@@ -33,15 +33,15 @@ class LDSTeleop():
         self.ros_clock = rospy.Rate(ROS_RATE)
 
         pg.init()
-        pg.display.set_caption("LDS Control")
+        pg.display.set_caption("Laser Scan Display Teleoperation")
         self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.text = Text('Collision Warning') 
         self.running = True
 
         # Start ROS subscriber thread
         self.sub_thread = threading.Thread(target=self.subscriber_thread)
         self.sub_thread.daemon = True
         self.sub_thread.start()
-    
         
     def ros_lds_callback(self, msg):
         with scan_data_lock:
@@ -94,9 +94,11 @@ class LDSTeleop():
             for x in range(360):
                 self.lds_particles[x].refresh(x, self.ranges[x])    
             if self.collision:
-                pg.display.set_caption('Collision Warning!!!')
+                pg.display.set_caption('Collision Warning!')
+                self.all_sprites.add(self.text)
             else:
-                pg.display.set_caption('LDS Control')
+                pg.display.set_caption('Laser Scan Display Teleoperation')
+                self.all_sprites.remove(self.text)
         self.all_sprites.update()
         self.pub.publish(self.tw)
 
@@ -105,7 +107,6 @@ class LDSTeleop():
         self.all_sprites.draw(self.screen)
         pg.display.flip()
 
-    
 if __name__ == '__main__':
     lds_teleop = LDSTeleop()
     lds_teleop.run()
