@@ -24,7 +24,6 @@ class RobotModel(pg.sprite.Sprite):
         self.rect.centerx = self.x
         self.rect.centery = self.y
 
-
 class LDS(pg.sprite.Sprite):
     def __init__(self, group, leader, deg, r):
         super().__init__(group)

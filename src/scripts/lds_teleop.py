@@ -16,6 +16,8 @@ class LDSTeleop():
         self.lds_particles = []
         self.all_sprites = pg.sprite.Group()
         self.robot = RobotModel((SCREEN_WIDTH/2), (SCREEN_HEIGHT/2), self.all_sprites)
+        
+        # Initialize LDS particles in coordinate system
         for x in range(360):
             self.lds_particles.append(LDS(self.all_sprites, self.robot, x, 0))
         
