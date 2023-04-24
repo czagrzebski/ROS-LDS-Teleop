@@ -19,7 +19,7 @@ DT = 1.0/ROS_RATE # s
 YELLOW = (255, 255, 0)
 BLACK = (0, 0, 0)
 
-# Rotation Matrix Definition
+# Rotation Matrix Definitions
 XAXIS = (1, 0, 0)
 YAXIS = (0, 1, 0)
 ZAXIS = (0, 0, 1)

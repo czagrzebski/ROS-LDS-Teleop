@@ -18,11 +18,35 @@ class RobotModel(pg.sprite.Sprite):
         
         self.x = x
         self.y = y
+        self.direction = 0
+        self.pw = np.zeros(3)
         
+    def move(self, v=0, a=0):
+        # Calculate new heading with respect to global frame
+        self.direction += a * DT
+        
+        # Get displacement with respect to local frame
+        pl = np.array([v * DT, 0, 0])
+        
+        # Generate transformation matrix from ROS tf library and extract rotation matrix 
+        # from homogeneous matrix
+        rot_z = tf.transformations.rotation_matrix(self.direction, ZAXIS) [:3, :3]
+        
+        # Transform displacement to global frame
+        self.pw = np.dot(rot_z, pl)
+  
     def update(self):
         # Translate robot to new position in global frame
         self.rect.centerx = self.x
         self.rect.centery = self.y
+        
+class LocalRefFrame(RobotModel):
+    def __init__(self, x, y, group):
+        super().__init__(x, y, group)
+        
+    # Override move method to disable movement
+    def move(self, v=0, a=0):
+        pass
 
 class LDS(pg.sprite.Sprite):
     def __init__(self, group, leader, deg, r):
@@ -58,3 +82,4 @@ class Text(pg.sprite.Sprite):
         font = pg.font.SysFont('Arial', 30)
         self.image = font.render(text, False, YELLOW)
         self.rect = self.image.get_rect()
+        
