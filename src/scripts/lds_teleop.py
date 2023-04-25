@@ -67,7 +67,7 @@ class LDSTeleop():
         # Register signal handler for clean shutdown
         signal.signal(signal.SIGINT, self.signal_handler)
         
-        # Join pygame thread for graceful shutdown. Subscriber thread will terminate with main thread.
+        # Join pygame thread for graceful shutdown. 
         self.pygame_thread.join()
         
     def signal_handler(self, sig, frame):
