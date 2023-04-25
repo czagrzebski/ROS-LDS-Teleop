@@ -10,14 +10,13 @@ Last Modified: 04/20/2023
 import rospy
 import pygame as pg
 import threading
-import os
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
 from sprites import LDS, LocalRefFrame, Text
 from settings import *
 from pygame.locals import * 
-import signal
 import sys
+import signal
 import numpy as np
 
 class LDSTeleop():
@@ -55,22 +54,25 @@ class LDSTeleop():
         self.text = Text('Collision Warning') 
         self.running = True
 
-        # Start ROS subscriber thread
+        # Start ROS subscriber thread as daemon to allow for clean shutdown
         self.sub_thread = threading.Thread(target=self.subscriber_thread)
         self.sub_thread.daemon = True
         self.sub_thread.start()
         
-        # Start Pygame thread
+        # Start Pygame thread 
         self.pygame_thread = threading.Thread(target=self.run)
         self.pygame_thread.daemon = True
         self.pygame_thread.start()
         
-        # Register signal handler to exit program on Ctrl-C
+        # Register signal handler for clean shutdown
         signal.signal(signal.SIGINT, self.signal_handler)
         
-    def signal_handler(self, signal, frame):
-        sys.exit(0)
+        # Join pygame thread for graceful shutdown. Subscriber thread will terminate with main thread.
+        self.pygame_thread.join()
         
+    def signal_handler(self, sig, frame):
+        sys.exit()
+             
     def ros_lds_callback(self, msg):
         with self.scan_data_lock:
             self.ranges = np.array(msg.ranges)
@@ -93,13 +95,13 @@ class LDSTeleop():
             self.events()
             self.update()
             self.draw()
-        pg.quit()
-        os._exit(0)
-            
+        
     def events(self):
         for event in pg.event.get():
             if event.type == QUIT:
                 self.running = False
+                pg.quit()
+                sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_a:
                     self.tw.angular.z = ANGULAR_SPEED
@@ -136,4 +138,3 @@ class LDSTeleop():
 
 if __name__ == '__main__':
     lds_teleop = LDSTeleop()
-    lds_teleop.run()
