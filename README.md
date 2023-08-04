@@ -1,4 +1,4 @@
-# cs431-lds-teleop
+# Teleoperation with Laser Scan Display
 Laser Distance Sensor Display (LDS) with pre-collision alerts for ROS Mobile Robots that use `/scan` and `/cmd_vel` topics. Built using pygame and rospy. 
 
 ## How it works
